@@ -1,0 +1,67 @@
+/* style.css — pre-pilot task shell. Mobile-first; desktop gets the same layout. */
+:root { --bg: #ffffff; --fg: #111; --zone: #f0f0f0; --zone-active: #cfe3ff; --dim: #999; }
+html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg);
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  touch-action: manipulation; overscroll-behavior: none; }
+.jspsych-display-element { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+.jspsych-content { max-width: 100%; }
+.jspsych-content-wrapper { padding: 0; }
+
+/* ---- face-word trial ---- */
+.fw-stage { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--bg); }
+.fw-top { flex: 0 0 auto; height: 18vh; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 1vh; }
+.fw-word { font-size: clamp(28px, 7vw, 44px); font-weight: 600; letter-spacing: 0.04em; text-transform: lowercase; }
+.fw-mid { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; min-height: 0; }
+.fw-face { max-height: 100%; max-width: 70vw; object-fit: contain; display: block; }
+.fw-fix { font-size: clamp(40px, 10vw, 64px); font-weight: 300; }
+/* word superimposed on the face (config word_position = "over") */
+.word-over .fw-top { height: 8vh; }
+.word-over .fw-mid { position: relative; }
+.word-over .fw-face { max-width: 92vw; }
+.fw-word.over { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center;
+  color: #111; text-shadow: 0 0 2px #fff, 0 0 6px #fff, 0 0 10px #fff; pointer-events: none; }
+.fw-zones { flex: 0 0 auto; height: 28vh; display: flex; gap: 2px; padding: 0 0 env(safe-area-inset-bottom); }
+.fw-zone { flex: 1; display: flex; align-items: center; justify-content: center;
+  background: var(--zone); font-size: clamp(18px, 5vw, 26px); font-weight: 600; letter-spacing: 0.08em;
+  border-radius: 14px 14px 0 0; }
+.fw-zone.active { background: var(--zone-active); }
+.fw-zone.disabled { color: #bbb; }
+.fw-feedback { font-size: clamp(22px, 5vw, 32px); color: #666; }
+.fw-feedback.ok { color: #2e7d32; } .fw-feedback.bad { color: #c62828; }
+
+/* ---- rest ---- */
+.rest-stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+.rest-stage { flex-direction: column; }
+.rest-cross { font-size: 64px; font-weight: 300; transition: opacity 120ms; }
+.rest-caption { position: absolute; left: 0; right: 0; bottom: calc(10vh + env(safe-area-inset-bottom, 0px)); text-align: center;
+  padding: 0 24px; font-size: 16px; color: #777; }
+
+/* ---- probe ---- */
+.probe { max-width: 520px; margin: 0 auto; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); text-align: left; }
+.probe h2 { font-size: 20px; margin: 0 0 12px; }
+.probe textarea { width: 100%; box-sizing: border-box; min-height: 110px; font-size: 17px; padding: 10px; border: 1px solid #bbb; border-radius: 8px; }
+.probe .q { margin: 22px 0 6px; font-size: 17px; }
+.probe .scale { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-top: 4px; }
+.probe .scale.three span { flex: 1; } .probe .scale.three span:nth-child(2) { text-align: center; } .probe .scale.three span:nth-child(3) { text-align: right; }
+.probe .intro { font-size: 17px; margin: 0 0 6px; }
+.probe .hint { color: #666; font-weight: normal; }
+.probe .topics { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.probe .topic { display: flex; align-items: center; gap: 12px; font-size: 17px; padding: 10px 12px; border: 1px solid #ccc; border-radius: 10px; }
+.probe .topic input { width: 22px; height: 22px; margin: 0; }
+.probe .topic:has(input:checked) { background: #e8f0fe; border-color: #2a6fdb; }
+.probe input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 28px; background: transparent; }
+.probe input[type=range]::-webkit-slider-runnable-track { height: 6px; background: #ddd; border-radius: 3px; }
+.probe input[type=range]::-moz-range-track { height: 6px; background: #ddd; border-radius: 3px; }
+.probe input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px; border-radius: 50%; background: #2a6fdb; }
+.probe input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: #2a6fdb; border: 0; }
+.probe input[type=range].untouched::-webkit-slider-thumb { opacity: 0; }
+.probe input[type=range].untouched::-moz-range-thumb { opacity: 0; }
+.probe button { margin-top: 26px; width: 100%; font-size: 18px; padding: 14px; border-radius: 10px; border: 0; background: #2a6fdb; color: #fff; }
+.probe button:disabled { background: #bbb; }
+
+/* ---- instructions / breaks ---- */
+.txt { max-width: 560px; margin: 0 auto; padding: 28px 22px; text-align: left; font-size: 18px; line-height: 1.45; }
+.txt h1 { font-size: 24px; }
+.txt .hint { color: #666; font-size: 15px; }
+.txt .ready { text-align: center; font-size: 22px; color: #666; margin-top: 30vh; }
+.jspsych-btn { font-size: 18px; padding: 12px 22px; border-radius: 10px; }

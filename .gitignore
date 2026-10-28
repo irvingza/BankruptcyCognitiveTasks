@@ -1,0 +1,4 @@
+data/*.json
+data/*.csv
+data/*.png
+.DS_Store
