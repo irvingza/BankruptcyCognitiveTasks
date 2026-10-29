@@ -126,8 +126,9 @@
         taps.push({ t: Math.round(now), hit: !!open, input: how });
       };
       stage.onpointerdown = e => { e.preventDefault(); onTap("touch"); };
-      const kl = this.jsPsych.pluginAPI.getKeyboardResponse({ callback_function: () => onTap("key"),
-        valid_responses: "ALL_KEYS", rt_method: "performance", persist: true, allow_held_key: false });
+      // any key, anywhere on the page (document-level, so it works even if focus has left the task element)
+      const onKey = e => { if (e.repeat) return; if (!running) return; e.preventDefault(); onTap("key"); };
+      document.addEventListener("keydown", onKey);
 
       const tick = () => {
         if (finished) return;
@@ -153,7 +154,7 @@
             lastTick = now; requestAnimationFrame(tick); return;
           }
           if (elapsed >= t.duration_ms) {
-            finished = true; this.jsPsych.pluginAPI.cancelKeyboardResponse(kl); stage.onpointerdown = null;
+            finished = true; document.removeEventListener("keydown", onKey); stage.onpointerdown = null;
             el.innerHTML = "";
             this.jsPsych.finishTrial({ rest_duration_ms: Math.round(elapsed), dims, taps, probes,
               n_dims: dims.length, n_hits: dims.filter(d => d.hit).length,
@@ -185,7 +186,7 @@
   const PROBE_TOPICS = [
     ["friends_family", "Friends or family"], ["work", "Work"], ["finances", "Your finances"],
     ["body", "Discomfort in your body"], ["future", "Plans for the future"], ["past", "Memories about the past"],
-    ["hobbies", "Your hobbies"], ["nothing", "Nothing but the cross"], ["other", "Other"],
+    ["hobbies", "Your hobbies"], ["nothing", "Nothing but the cross"], ["blank", "My mind was blank"], ["other", "Other"],
   ];
   function runProbe(el, meta) {
     return new Promise(resolve => {
@@ -217,11 +218,14 @@
             `<label class="topic"><input type="checkbox" id="pr-t-${id}" value="${id}"><span>${label}</span></label>`).join("")}</div>
           <button id="pr-go2" disabled>Continue</button></div>`;
         const boxes = PROBE_TOPICS.map(([id]) => el.querySelector("#pr-t-" + id));
-        const nothing = el.querySelector("#pr-t-nothing"), go2 = el.querySelector("#pr-go2");
+        const go2 = el.querySelector("#pr-go2");
+        // "Nothing but the cross" and "My mind was blank" are exclusive: selecting either clears
+        // everything else; selecting any content option clears both.
+        const excl = [el.querySelector("#pr-t-nothing"), el.querySelector("#pr-t-blank")];
         const check2 = () => { go2.disabled = !boxes.some(b => b.checked); };
         boxes.forEach(b => b.addEventListener("change", () => {
-          if (b === nothing && b.checked) boxes.forEach(o => { if (o !== nothing) o.checked = false; });
-          else if (b !== nothing && b.checked) nothing.checked = false;
+          if (excl.includes(b) && b.checked) boxes.forEach(o => { if (o !== b) o.checked = false; });
+          else if (!excl.includes(b) && b.checked) excl.forEach(o => { o.checked = false; });
           check2();
         }));
         go2.onclick = () => {
